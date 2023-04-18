@@ -22,15 +22,15 @@ const config = {
     wsPort: 40510,
     homePage: path.join(process.cwd(), 'public', 'rpf.html'),
     sharedFolder: path.join(process.cwd(), 'upload'),
-       // !!! TODO: be better w/ *.*
+    // !!! TODO: be better w/ *.*
     listCommand: 'rpfolio -l <drive>*.*',
     transferCommand: 'rpfolio -f -t <file> <drive>',
     ID: 'Portfolio Folder Daemon',
     VERSION: 'v1.0 - LH 02/2023',
     BEEP: '\u0007',
-  };
+};
 
-  
+
 ///////////////////////////////////////////////////////////////////////////////
 
 // use drive parameter, or default to c:
@@ -51,40 +51,40 @@ const dir = getDirList();
 
 ///////////////////////////////////////////////////////////////////////////////
 
-function  setupWebserver() {
+function setupWebserver() {
     const app = express();
     // serve static files from the public directory
     app.use(express.static('public'));
     // set the default route to the home page
-    app.get('/download/:filename', function(req, res) {
+    app.get('/download/:filename', function (req, res) {
         const fileName = req.params.filename;
         console.log('download ${fileName}');
         res.status(404).send(`File not found: ${fileName}`);
 
 
-//        const filePath = path.join(__dirname, 'public', fileName);
-    //    res.download(filePath, fileName);
+        //        const filePath = path.join(__dirname, 'public', fileName);
+        //    res.download(filePath, fileName);
     });
 
     // set the MIME type for HTML, CSS, and JavaScript files
-    app.get('*.(html|css|js)', function(req, res) {
+    app.get('*.(html|css|js)', function (req, res) {
         const filePath = path.join(__dirname, 'public', req.path);
         res.sendFile(filePath);
-      });
-
-      app.get('/', function(req, res) {
-        res.sendFile(config.homePage);
-      });
-  
-      // start the web server
-    app.listen(config.appPort, () => {
-      const address = getIP();
-      console.log('Webserver running');
-      console.log(`http://${address}:${config.appPort}`);
-      console.log();
     });
-  }
-    
+
+    app.get('/', function (req, res) {
+        res.sendFile(config.homePage);
+    });
+
+    // start the web server
+    app.listen(config.appPort, () => {
+        const address = getIP();
+        console.log('Webserver running');
+        console.log(`http://${address}:${config.appPort}`);
+        console.log();
+    });
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 function setupWebSockets() {
@@ -94,7 +94,7 @@ function setupWebSockets() {
         ws.binaryType = 'arraybuffer';
         clients.push(ws);
         console.log(`client connected: ${clients.length}`);
-        
+
         ws.on('message', (event) => {
             console.log(`${event} from client`);
             const message = JSON.parse(event);
@@ -102,12 +102,12 @@ function setupWebSockets() {
                 case 'page_loaded':
                     sendSetFolder(drive + '\\');
                     //sendDirList();
-const message = {
-    command: 'dir',
-    files: ["one.js","two.js"]
-};
-clients.forEach(client => client.send(JSON.stringify(message)));
-                                    
+                    const message = {
+                        command: 'dir',
+                        files: ["one.js", "two.js"]
+                    };
+                    clients.forEach(client => client.send(JSON.stringify(message)));
+
                     break;
                 case 'set_folder':
                     // Handle the 'set_folder' command here
@@ -115,7 +115,7 @@ clients.forEach(client => client.send(JSON.stringify(message)));
                 default:
                     console.log('Unknown command:', message.command);
             }
-        });    
+        });
 
         ws.on('close', () => {
             clients = clients.filter(client => client !== ws);
@@ -160,13 +160,13 @@ function sendToWebsite(data) {
 function getIP() {
     const ifaces = require('os').networkInterfaces();
     for (const dev in ifaces) {
-      const address = ifaces[dev].find(details => details.family === 'IPv4' && !details.internal)?.address;
-      if (address) {
-        return address;
-      }
+        const address = ifaces[dev].find(details => details.family === 'IPv4' && !details.internal)?.address;
+        if (address) {
+            return address;
+        }
     }
-  }
-  
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 function getDirList() {
