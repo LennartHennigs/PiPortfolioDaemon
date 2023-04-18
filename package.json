@@ -1,0 +1,28 @@
+{
+  "name": "atari-portfolio-uploader",
+  "version": "1.0.0",
+  "description": "Watches a directory, uploads its content to the Atari Portfolio, and deletes the files.",
+  "main": "index.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node index.mjs"
+  },
+  "keywords": [
+    "atari",
+    "portfolio",
+    "file",
+    "upload"
+  ],
+  "author": "LH",
+  "license": "ISC",
+  "dependencies": {
+    "chokidar": "^3.5.2",
+    "express": "^4.17.1",
+    "ws": "^8.2.3"
+  }
+  "bugs": {
+    "url": "https://github.com/LennartHennigs/PiPortfolioDaemon/issues"
+  },
+  "homepage": "https://github.com/LennartHennigs/PiPortfolioDaemon#readme"
+}
+
