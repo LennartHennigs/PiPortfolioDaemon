@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Watches a directory, uploads its content to the Atari Portfolio, and deletes the files.",
   "main": "index.mjs",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "start": "node index.mjs"
   },
