@@ -10,28 +10,28 @@
 */
 ///////////////////////////////////////////////////////////////////////////////
 
+const path = require('path');
 const os = require('os');
 const fs = require('fs');
-const path = require('path');
 const express = require('express');
-const chokidar = require('chokidar');
 const WebSocket = require('ws');
+const chokidar = require('chokidar');
 const { execSync } = require('child_process');
-
 ///////////////////////////////////////////////////////////////////////////////
 
 const config = {
     appPort: 3000,
     wsPort: 40510,
-    homePage: path.join(__dirname, 'public', 'rpf.html'),
-    sharedFolder: path.join(__dirname, 'upload'),
-    // !!! TODO: be better w/ *.*
+    homePage: path.join(process.cwd(), 'public', 'rpf.html'),
+    sharedFolder: path.join(process.cwd(), 'upload'),
+       // !!! TODO: be better w/ *.*
     listCommand: 'rpfolio -l <drive>*.*',
     transferCommand: 'rpfolio -f -t <file> <drive>',
     ID: 'Portfolio Folder Daemon',
     VERSION: 'v1.0 - LH 02/2023',
     BEEP: '\u0007',
   };
+
   
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -55,21 +55,32 @@ const dir = getDirList();
 
 function setupWebserver() {
     const app = express();
-    app.get('/', (req, res) => res.sendFile(config.homePage));
-    app.listen(config.appPort, () => {
-        const address = getIP();
-        console.log('Webserver running');
-        console.log(`http://${address}:${config.appPort}`);
-        console.log();
+    // serve static files from the public directory
+    app.use(express.static('public'));
+    // set the MIME type for HTML, CSS, and JavaScript files
+    app.get('*.(html|css|js)', function(req, res) {
+      const filePath = path.join(__dirname, 'public', req.path);
+      res.sendFile(filePath);
     });
-}
-
+    // set the default route to the home page
+    app.get('/', function(req, res) {
+      res.sendFile(config.homePage);
+    });
+    // start the web server
+    app.listen(config.appPort, () => {
+      const address = getIP();
+      console.log('Webserver running');
+      console.log(`http://${address}:${config.appPort}`);
+      console.log();
+    });
+  }
+    
 ///////////////////////////////////////////////////////////////////////////////
 
 function setupWebSockets() {
-    const ws_server = new WebSocket.Server({ port: config.wsPort });
+    const wsServer = new WebSocket.Server({ port: config.wsPort });
   
-    ws_server.on('connection', ({ binaryType, send, on, close }) => {
+    wsServer.on('connection', ({ binaryType, send, on, close }) => {
       binaryType = 'arraybuffer';
       clients.push({ send, close });
       console.log(`client connected: ${clients.length}`);
