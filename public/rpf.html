@@ -8,8 +8,20 @@
 </head>
 <body>
 <h1>Atari Portfolio</h1>
-<textarea id="log" name="log" cols="60" rows="10" readonly="readonly"></textarea>
+
+<label for="current_folder">Folder:</label>
+<input type="text" id="current_folder" name="current_folder">
+<button type="submit" onclick="sendFolder()">Submit</button>
 <button id="clear" name="clear" onclick="document.getElementById('log').value = ''">Clear</button>
+<div id="dir_container">
+    <h3>File list:</h3>
+    <ul id="file_list"></ul>
+</div>
+
+<br>
+<textarea id="log" name="log" cols="60" rows="10" readonly="readonly"></textarea>
+
+
 <script src="rpf.js" type="application/javascript"></script>
 </body>
 </html>

@@ -1,94 +1,72 @@
+let debug = false;
 
 const port = 40510;
-const ws_uri = `ws://${location.hostname}:${port}`;
-var ws;
-
-if (window.WebSocket == 'undefined') {
-    alert("websockets are not supported");
-} else {
-    // establish websocket connection
-    startWS(`ws://${location.hostname}:${port}`);  
-};
-
-function startWS(uri) {
-    try {
-        ws = new WebSocket(uri);
-        // connect
-        ws.onopen = () => {
-            console.log("Connected to server!");
-ws.send('hi');
-        };
-        // handle server messages
-        ws.onmessage = (event) => {
-            const msg = event.data;
-console.log(event);
-ws.send('pong');
-            const element = document.getElementById('log');
-            element.value = element.value + event.data; 
-        };
-        ws.onclose = () => {
-            ws = null;
-            console.log("Disonnected to server!");
-            // https://stackoverflow.com/questions/3780511/reconnection-of-client-when-server-reboots-in-websocket
-            setTimeout(() => { startWS(uri) }, 5000);
-        };
-    } catch (error) {
-       // console.log('error: ' + error);
-    }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-const port = 40510;
-const wsUri = `ws://${location.hostname}:${port}`;
-let ws;
-
-///////////////////////////////////////////////////////////////////////////////
+let ws = new WebSocket(`ws://${location.hostname}:${port}`);
 
 if (typeof window.WebSocket === 'undefined') {
-    alert("Websockets are not supported");
-} else {
-    startWS(wsUri);
+  alert('Websockets are not supported');
 }
 
-///////////////////////////////////////////////////////////////////////////////
+ws.addEventListener('open', () => {
+  console.log('Connected to server!');
+  ws.send(JSON.stringify({ command: 'page_loaded' }));
+});
 
-function startWS(uri) {
-    ws = new WebSocket(uri);
-    ws.addEventListener('open', onOpen);
-    ws.addEventListener('message', onMessage);
-    ws.addEventListener('close', onClose);
+ws.addEventListener('message', (event) => {
+  const msg = JSON.parse(event.data);
+  if (debug) console.log(msg);
+
+  switch (msg.command) {
+    case 'log':
+      updateLog(msg.data);
+      break;
+    case 'set_folder':
+      getFolder(msg.folder);
+      break;
+    case 'dir':
+      populateFileList(msg);
+      break;
+    default:
+      console.log('error');
+      break;
+  }
+});
+
+ws.addEventListener('close', () => {
+  ws = null;
+  console.log('Disconnected!!');
+  setTimeout(() => {
+    ws = new WebSocket(`ws://${location.hostname}:${port}`);
+  }, 5000);
+});
+
+function getFolder(folder) {
+  document.getElementById('current_folder').value = folder;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+function populateFileList({ files = [] } = {}) {
+  const fileList = document.getElementById('file_list');
+  fileList.innerHTML = '';
 
-function onOpen() {
-    console.log("Connected to server!");
-    ws.send('hi');
+  files.forEach(file => {
+    const listItem = document.createElement('li');
+    const link = document.createElement('a');
+    link.href = `/download/${file}`;
+    link.textContent = file;
+    listItem.appendChild(link);
+    fileList.appendChild(listItem);
+  });
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-function onMessage({data}) {
-    console.log(data);
-    ws.send('pong');
-    appendLog(data);
+function updateLog(data) {
+  document.getElementById('log').value += data;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-function onClose() {
-    ws = null;
-    console.log("Disconnected from server!");
-    // https://stackoverflow.com/questions/3780511/reconnection-of-client-when-server-reboots-in-websocket
-    setTimeout(() => startWS(wsUri), 5000);
+function sendFolder() {
+  const folder = document.getElementById('current_folder').value;
+  const message = {
+    command: 'set_folder',
+    folder,
+  };
+  ws.send(JSON.stringify(message));
 }
-
-///////////////////////////////////////////////////////////////////////////////
-
-function appendLog(data) {
-    const logElement = document.getElementById('log');
-    logElement.value += data;
-}
-
-///////////////////////////////////////////////////////////////////////////////

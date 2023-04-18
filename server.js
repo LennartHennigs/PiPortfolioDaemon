@@ -4,9 +4,7 @@
     watches a directory and upload its content to the Atari Portfolio
     ...and deletes them afterwards
 
-    Node JS Script - LH 02/2023
-
-    Install: npm install chokidar express ws
+    Node JS Script - LH 04/2023
 */
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -53,20 +51,32 @@ const dir = getDirList();
 
 ///////////////////////////////////////////////////////////////////////////////
 
-function setupWebserver() {
+function  setupWebserver() {
     const app = express();
     // serve static files from the public directory
     app.use(express.static('public'));
+    // set the default route to the home page
+    app.get('/download/:filename', function(req, res) {
+        const fileName = req.params.filename;
+        console.log('download ${fileName}');
+        res.status(404).send(`File not found: ${fileName}`);
+
+
+//        const filePath = path.join(__dirname, 'public', fileName);
+    //    res.download(filePath, fileName);
+    });
+
     // set the MIME type for HTML, CSS, and JavaScript files
     app.get('*.(html|css|js)', function(req, res) {
-      const filePath = path.join(__dirname, 'public', req.path);
-      res.sendFile(filePath);
-    });
-    // set the default route to the home page
-    app.get('/', function(req, res) {
-      res.sendFile(config.homePage);
-    });
-    // start the web server
+        const filePath = path.join(__dirname, 'public', req.path);
+        res.sendFile(filePath);
+      });
+
+      app.get('/', function(req, res) {
+        res.sendFile(config.homePage);
+      });
+  
+      // start the web server
     app.listen(config.appPort, () => {
       const address = getIP();
       console.log('Webserver running');
@@ -79,19 +89,40 @@ function setupWebserver() {
 
 function setupWebSockets() {
     const wsServer = new WebSocket.Server({ port: config.wsPort });
-  
-    wsServer.on('connection', ({ binaryType, send, on, close }) => {
-      binaryType = 'arraybuffer';
-      clients.push({ send, close });
-      console.log(`client connected: ${clients.length}`);
-      on('open', () => send('ping'));
-      on('message', event => console.log(`${event} from client`));
-      on('close', () => {
-        clients = clients.filter(({ close: clientClose }) => clientClose !== close);
-        console.log(`client disconnected: ${clients.length}`);
-      });
+
+    wsServer.on('connection', (ws) => {
+        ws.binaryType = 'arraybuffer';
+        clients.push(ws);
+        console.log(`client connected: ${clients.length}`);
+        
+        ws.on('message', (event) => {
+            console.log(`${event} from client`);
+            const message = JSON.parse(event);
+            switch (message.command) {
+                case 'page_loaded':
+                    sendSetFolder(drive + '\\');
+                    //sendDirList();
+const message = {
+    command: 'dir',
+    files: ["one.js","two.js"]
+};
+clients.forEach(client => client.send(JSON.stringify(message)));
+                                    
+                    break;
+                case 'set_folder':
+                    // Handle the 'set_folder' command here
+                    break;
+                default:
+                    console.log('Unknown command:', message.command);
+            }
+        });    
+
+        ws.on('close', () => {
+            clients = clients.filter(client => client !== ws);
+            console.log(`client disconnected: ${clients.length}`);
+        });
     });
-  }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -116,6 +147,16 @@ function setupDaemon() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+function sendToWebsite(data) {
+    const message = {
+        command: 'log',
+        data: data
+    };
+    clients.forEach(item => item.send(JSON.stringify(message)));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 function getIP() {
     const ifaces = require('os').networkInterfaces();
     for (const dev in ifaces) {
@@ -128,12 +169,6 @@ function getIP() {
   
 ///////////////////////////////////////////////////////////////////////////////
 
-function sendToWebsite(data) {
-    clients.forEach(item => item.send(data));
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 function getDirList() {
     const action = config.listCommand.replace('<drive>', drive);
     try {
@@ -143,6 +178,28 @@ function getDirList() {
         console.error('Error getting dir list:', error.message);
     }
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+function sendDirList() {
+    const dirList = getDirList();
+    const message = {
+        command: 'dir',
+        files: dirList
+    };
+    clients.forEach(client => client.send(JSON.stringify(message)));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+function sendSetFolder(folder) {
+    const message = {
+        command: 'set_folder',
+        folder: folder
+    };
+    clients.forEach(client => client.send(JSON.stringify(message)));
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 function transferFile(fn) {
@@ -165,6 +222,5 @@ function transferFile(fn) {
     }
     return true;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
