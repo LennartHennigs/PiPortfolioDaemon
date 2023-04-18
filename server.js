@@ -10,32 +10,29 @@
 */
 ///////////////////////////////////////////////////////////////////////////////
 
-const path = require('path');
 const os = require('os');
 const fs = require('fs');
+const path = require('path');
 const express = require('express');
-const WebSocket = require('ws');
 const chokidar = require('chokidar');
+const WebSocket = require('ws');
 const { execSync } = require('child_process');
 
 ///////////////////////////////////////////////////////////////////////////////
 
-const appPort = 3000;
-const wsPort = 40510;
-
-const homePage = path.join(__dirname, 'public', 'rpf.html');
-const sharedFolder = path.join(__dirname, 'upload');
-
-///////////////////////////////////////////////////////////////////////////////
-
-// !!! TODO: be better w/ *.*
-const listCommand = 'rpfolio -l <drive>*.*';
-const transferCommand = 'rpfolio -f -t <file> <drive>';
-
-const ID = 'Portfolio Folder Daemon';
-const VERSION = 'v1.0 - LH 02/20    23';
-const BEEP = '\007';
-
+const config = {
+    appPort: 3000,
+    wsPort: 40510,
+    homePage: path.join(__dirname, 'public', 'rpf.html'),
+    sharedFolder: path.join(__dirname, 'upload'),
+    // !!! TODO: be better w/ *.*
+    listCommand: 'rpfolio -l <drive>*.*',
+    transferCommand: 'rpfolio -f -t <file> <drive>',
+    ID: 'Portfolio Folder Daemon',
+    VERSION: 'v1.0 - LH 02/2023',
+    BEEP: '\u0007',
+  };
+  
 ///////////////////////////////////////////////////////////////////////////////
 
 // use drive parameter, or default to c:
@@ -44,9 +41,8 @@ const drive = (args[0] === undefined) ? 'c:' : args[0];
 
 let clients = [];
 
-
 console.log();
-console.log(`${ID} ${VERSION}`);
+console.log(`${config.ID} ${config.VERSION}`);
 console.log(`-> ${drive}\n`);
 
 setupWebserver();
@@ -59,11 +55,11 @@ const dir = getDirList();
 
 function setupWebserver() {
     const app = express();
-    app.get('/', (req, res) => res.sendFile(homePage));
-    app.listen(appPort, () => {
+    app.get('/', (req, res) => res.sendFile(config.homePage));
+    app.listen(config.appPort, () => {
         const address = getIP();
         console.log('Webserver running');
-        console.log(`http://${address}:${appPort}`);
+        console.log(`http://${address}:${config.appPort}`);
         console.log();
     });
 }
@@ -71,7 +67,7 @@ function setupWebserver() {
 ///////////////////////////////////////////////////////////////////////////////
 
 function setupWebSockets() {
-    const ws_server = new WebSocket.Server({ port: wsPort });
+    const ws_server = new WebSocket.Server({ port: config.wsPort });
   
     ws_server.on('connection', ({ binaryType, send, on, close }) => {
       binaryType = 'arraybuffer';
@@ -89,7 +85,7 @@ function setupWebSockets() {
 ///////////////////////////////////////////////////////////////////////////////
 
 function setupDaemon() {
-    const watcher = chokidar.watch(sharedFolder, {
+    const watcher = chokidar.watch(config.sharedFolder, {
         ignored: /(^|[\/\\])\../,
         persistent: true,
         awaitWriteFinish: true
@@ -103,7 +99,7 @@ function setupDaemon() {
         const res = transferFile(fn) ? '\u{2705}' : '\u{274c}';
         console.log(res);
         sendToWebsite(res + '\n');
-        process.stdout.write(BEEP);
+        process.stdout.write(config.BEEP);
     });
 }
 
@@ -128,7 +124,7 @@ function sendToWebsite(data) {
 ///////////////////////////////////////////////////////////////////////////////
 
 function getDirList() {
-    const action = listCommand.replace('<drive>', drive);
+    const action = config.listCommand.replace('<drive>', drive);
     try {
         const res = execSync(action, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().split('\n').filter(Boolean).slice(2);
         return res;
@@ -144,7 +140,7 @@ function transferFile(fn) {
         return false;
     }
     try {
-        const action = transferCommand.replace('<file>', fn).replace('<drive>', drive);
+        const action = config.transferCommand.replace('<file>', fn).replace('<drive>', drive);
         execSync(action, { stdio: ['ignore', 'pipe', 'ignore'] });
     } catch (error) {
         console.error('Error during transfer:', error.message);
