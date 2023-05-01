@@ -10,20 +10,17 @@
     - need a Portfolio running in server mode (for now, to get the initial dir list)
 
     Features
-    - watches on upload folder reports uploads
-    - communicates successful transfer/error on web 
-    - moves the files to target folder (to check)
-    - can list the folder content (to make more robust, check if Portfolio is not there)
+    - watches on SAMBA upload folder & reports uploads
+    - moves the files to target folder
+    - communicates successful transfer/error on HTML 
+    - select the folder on the Portfolio
+    - lists the current folder content (to make more robust, check if Portfolio is not there)
+    - click on file will download it
     
     Todo; 
     - make the drive & folder handling better
-    - where do I move the files? selected folder?
-    - do i need to refresh the list after upload?
+    - i need to refresh the list after upload?
     - ? can i get all the folders on the Portfolio somehow?
-    - when the user clicks on a file, get it from the Portfolio and trigger download 
-    - make the execs more robust...
-    - layout HTML with CSS
-    - notify when websocket connection is lost
 */
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -34,6 +31,9 @@ const express = require('express');
 const WebSocket = require('ws');
 const chokidar = require('chokidar');
 const { execSync } = require('child_process');
+const ifaces = require('os').networkInterfaces();
+
+
 ///////////////////////////////////////////////////////////////////////////////
 
 const config = {
@@ -44,6 +44,7 @@ const config = {
     sharedFolder: path.join(process.cwd(), 'upload'),
     // !!! TODO: be better w/ *.*
     listCommand: './rpfolio2 -l <drive>*.*',
+    receiveCommand: './rpfolio2 -r -f <drive><file> .',
     transferCommand: './rpfolio2 -f -t <file> <drive>',
     ID: 'Portfolio Folder Daemon',
     VERSION: 'v0.9 - LH 05/2023',
@@ -53,52 +54,31 @@ const config = {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+const app = express();
 // use drive parameter, or default to c:
 const args = process.argv.slice(2);
 let drive = (args[0] === undefined) ? 'c:' : args[0];
-const app = express();
-
 let clients = [];
 
 console.log();
 console.log(`${config.ID} ${config.VERSION}`);
 console.log(`-> ${drive}\n`);
 
-// needs a portfolio connection
+// !!! console.log(config);
+console.log('Getting dir contents...');
 let dirContent = getDirListFromPortfolio();
-console.log(dirContent);
+console.log();
 
 setupWebserver();
 setupWebSockets();
 setupDaemon();
 
 ///////////////////////////////////////////////////////////////////////////////
-
+// defines routes for home page, JS, CSS, and for downloading files
 function setupWebserver() {
     // set the default route to the home page
-
-    app.get('/download/:filename', function (req, res) {
-        const fileName = req.params.filename;
-        console.log(`download ${fileName}`);
-
-// get the file from  the portfolio and send it
-
-        const filePath = path.join(__dirname, 'public', fileName);
-        
-        fs.stat(filePath, (err, stats) => {
-            if (err && err.code === 'ENOENT') {
-                res.status(404).send(`File not found: ${fileName}`);
-                console.log('404');
-            } else if (err) {
-                res.status(500).send(`Error checking file: ${fileName}`);
-                console.log('500');
-            } else if (stats.isFile()) {
-                res.download(filePath, fileName);
-            } else {
-                res.status(404).send(`Not a file: ${fileName}`);
-                console.log('404');
-            }
-        });    
+    app.get('/', (req, res) => {
+        res.sendFile(config.homepage);
     });
 
     // set the MIME type for HTML, CSS, and JavaScript files
@@ -107,9 +87,29 @@ function setupWebserver() {
         res.sendFile(filePath);
     });
 
-    app.get('/', (req, res) => {
-        res.sendFile(path.join(config.webserverPath, 'rpf.html'));
+    // download file from Portfolio locally, trigger download on HTML page, delete the file locally
+    app.get('/download/:filename', function (req, res) {
+        const fileName = req.params.filename;
+        console.log(`download ${fileName}`);
+        // get the file from the portfolio and send it
+        if(receiveFile(fileName)) {
+            const filePath = path.join(__dirname, fileName);
+            res.download(filePath, fileName, (err) => {
+                if (err) {
+                    res.status(500).send(`Error downloading the file: ${fileName}`);
+                    console.log(err);
+                } else {
+                    console.log('download ok');                    
+                    try {
+                        fs.unlinkSync(filePath);
+                    } catch (error) {
+                        console.error('Error during deletion:', error.message);
+                    }        
+                }
+            });
+        }
     });
+
     // start the web server
     app.listen(3000, () => {
        const address = getIP();
@@ -120,6 +120,7 @@ function setupWebserver() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// connects to websocket
 
 function setupWebSockets() {
     const wsServer = new WebSocket.Server({ port: config.wsPort });
@@ -131,30 +132,19 @@ function setupWebSockets() {
 
         ws.on('message', (event) => {
             const message = JSON.parse(event);
-            let  reply;
+            let reply;
             switch (message.command) {
                 case 'page_loaded':
                     console.log("- Page was loaded");
                     sendSetFolder(drive + '\\');
-                    //sendDirList();
-                    reply = {
-                        command: 'dir',
-                        files: dirContent
-                    };
-                    clients.forEach(client => client.send(JSON.stringify(reply)));
+                    sendDirList();
                     break;
                 case 'set_folder':
                     // Handle the 'set_folder' command here
                     console.log(`set folder ${message.folder}`)
                     drive = message.folder;
                     dirContent = getDirListFromPortfolio();
-console.log(dirContent);
-                    reply = {
-                        command: 'dir',
-                        files: dirContent
-                    };
-                    clients.forEach(client => client.send(JSON.stringify(reply)));
-
+                    sendDirList();
                     break;
                 default:
                     console.log('Unknown command:', message.command);
@@ -169,14 +159,13 @@ console.log(dirContent);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
+// sets up daemon to watch folder and triggers upload
 function setupDaemon() {
     const watcher = chokidar.watch(config.sharedFolder, {
         ignored: /(^|[\/\\])\../,
         persistent: true,
         awaitWriteFinish: true
     });
-
     watcher.on('add', (fn, stats) => {
         const fileName = path.basename(fn);
         const str = `- ${fileName} `;
@@ -190,7 +179,7 @@ function setupDaemon() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
+// sends the current file name to the HTML page
 function sendToWebsite(data) {
     const message = {
         command: 'log',
@@ -200,13 +189,12 @@ function sendToWebsite(data) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
+// gets the (WIFI) IP address from the Pi Zero
 function getIP() {
-    const ifaces = require('os').networkInterfaces();
     let address;
     for (const dev in ifaces) {
         if (dev.startsWith('wlan')) {
-            const iface = ifaces[dev].find(details => details.family === 'IPv4' && !details.internal);
+                const iface = ifaces[dev].find(details => details.family === 'IPv4' && !details.internal);
             if (iface) {
                 address = iface.address;
                 break;
@@ -217,7 +205,7 @@ function getIP() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
+// runs 
 function getDirListFromPortfolio() {
     const action = config.listCommand.replace('<drive>', drive);
     try {
@@ -229,18 +217,17 @@ function getDirListFromPortfolio() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
+// sends the folder content to the HTML page
 function sendDirList() {
-    const dirList = getDirList();
     const message = {
         command: 'dir',
-        files: dirList
+        files: dirContent
     };
     clients.forEach(client => client.send(JSON.stringify(message)));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
+// send the new folder name to the HTML page
 function sendSetFolder(folder) {
     const message = {
         command: 'set_folder',
@@ -250,7 +237,7 @@ function sendSetFolder(folder) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
+// gets file from shared folder and tries to send it the 
 function transferFile(fn) {
     if (!fs.existsSync(fn)) {
         console.error('File does not exist:', fn);
@@ -271,5 +258,20 @@ function transferFile(fn) {
     }
     return true;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// gets from from Portfolio and stores it locally
+
+function receiveFile(fn) {
+    try {
+        const action = config.receiveCommand.replace('<file>', fn).replace('<drive>', drive);
+        execSync(action, { stdio: ['ignore', 'pipe', 'ignore'] });
+    } catch (error) {
+        console.error('Error during transfer:', error.message);
+        return false;
+    }
+    return true;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
