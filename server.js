@@ -23,6 +23,7 @@
     - when the user clicks on a file, get it from the Portfolio and trigger download 
     - make the execs more robust...
     - layout HTML with CSS
+    - notify when websocket connection is lost
 */
 ///////////////////////////////////////////////////////////////////////////////
 
