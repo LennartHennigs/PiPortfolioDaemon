@@ -4,7 +4,25 @@
     watches a directory and upload its content to the Atari Portfolio
     ...and deletes them afterwards
 
-    Node JS Script - LH 04/2023
+    Node JS Script - LH 05/2023
+
+    Prerequisites
+    - need a Portfolio running in server mode (for now, to get the initial dir list)
+
+    Features
+    - watches on upload folder reports uploads
+    - communicates successful transfer/error on web 
+    - moves the files to target folder (to check)
+    - can list the folder content (to make more robust, check if Portfolio is not there)
+    
+    Todo; 
+    - make the drive & folder handling better
+    - where do I move the files? selected folder?
+    - do i need to refresh the list after upload?
+    - ? can i get all the folders on the Portfolio somehow?
+    - when the user clicks on a file, get it from the Portfolio and trigger download 
+    - make the execs more robust...
+    - layout HTML with CSS
 */
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -20,13 +38,14 @@ const { execSync } = require('child_process');
 const config = {
     appPort: 3000,
     wsPort: 40510,
-    homePage: path.join(process.cwd(), 'public', 'rpf.html'),
+    webserverPath: path.join(process.cwd(), 'public'),
+    homepage: path.join(process.cwd(), 'public', 'rpf.html'),
     sharedFolder: path.join(process.cwd(), 'upload'),
     // !!! TODO: be better w/ *.*
-    listCommand: 'rpfolio -l <drive>*.*',
-    transferCommand: 'rpfolio -f -t <file> <drive>',
+    listCommand: './rpfolio2 -l <drive>*.*',
+    transferCommand: './rpfolio2 -f -t <file> <drive>',
     ID: 'Portfolio Folder Daemon',
-    VERSION: 'v1.0 - LH 02/2023',
+    VERSION: 'v0.9 - LH 05/2023',
     BEEP: '\u0007',
 };
 
@@ -35,7 +54,8 @@ const config = {
 
 // use drive parameter, or default to c:
 const args = process.argv.slice(2);
-const drive = (args[0] === undefined) ? 'c:' : args[0];
+let drive = (args[0] === undefined) ? 'c:' : args[0];
+const app = express();
 
 let clients = [];
 
@@ -43,45 +63,58 @@ console.log();
 console.log(`${config.ID} ${config.VERSION}`);
 console.log(`-> ${drive}\n`);
 
+// needs a portfolio connection
+let dirContent = getDirListFromPortfolio();
+console.log(dirContent);
+
 setupWebserver();
 setupWebSockets();
 setupDaemon();
 
-const dir = getDirList();
-
 ///////////////////////////////////////////////////////////////////////////////
 
 function setupWebserver() {
-    const app = express();
-    // serve static files from the public directory
-    app.use(express.static('public'));
     // set the default route to the home page
+
     app.get('/download/:filename', function (req, res) {
         const fileName = req.params.filename;
-        console.log('download ${fileName}');
-        res.status(404).send(`File not found: ${fileName}`);
+        console.log(`download ${fileName}`);
 
+// get the file from  the portfolio and send it
 
-        //        const filePath = path.join(__dirname, 'public', fileName);
-        //    res.download(filePath, fileName);
+        const filePath = path.join(__dirname, 'public', fileName);
+        
+        fs.stat(filePath, (err, stats) => {
+            if (err && err.code === 'ENOENT') {
+                res.status(404).send(`File not found: ${fileName}`);
+                console.log('404');
+            } else if (err) {
+                res.status(500).send(`Error checking file: ${fileName}`);
+                console.log('500');
+            } else if (stats.isFile()) {
+                res.download(filePath, fileName);
+            } else {
+                res.status(404).send(`Not a file: ${fileName}`);
+                console.log('404');
+            }
+        });    
     });
 
     // set the MIME type for HTML, CSS, and JavaScript files
     app.get('*.(html|css|js)', function (req, res) {
-        const filePath = path.join(__dirname, 'public', req.path);
+        const filePath = path.join(config.webserverPath, req.path);
         res.sendFile(filePath);
     });
 
-    app.get('/', function (req, res) {
-        res.sendFile(config.homePage);
+    app.get('/', (req, res) => {
+        res.sendFile(path.join(config.webserverPath, 'rpf.html'));
     });
-
     // start the web server
-    app.listen(config.appPort, () => {
-        const address = getIP();
-        console.log('Webserver running');
-        console.log(`http://${address}:${config.appPort}`);
-        console.log();
+    app.listen(3000, () => {
+       const address = getIP();
+        console.log("Webserver running");
+       console.log(`http://${address}:${config.appPort}`);
+       console.log();
     });
 }
 
@@ -96,21 +129,31 @@ function setupWebSockets() {
         console.log(`client connected: ${clients.length}`);
 
         ws.on('message', (event) => {
-            console.log(`${event} from client`);
             const message = JSON.parse(event);
+            let  reply;
             switch (message.command) {
                 case 'page_loaded':
+                    console.log("- Page was loaded");
                     sendSetFolder(drive + '\\');
                     //sendDirList();
-                    const message = {
+                    reply = {
                         command: 'dir',
-                        files: ["one.js", "two.js"]
+                        files: dirContent
                     };
-                    clients.forEach(client => client.send(JSON.stringify(message)));
-
+                    clients.forEach(client => client.send(JSON.stringify(reply)));
                     break;
                 case 'set_folder':
                     // Handle the 'set_folder' command here
+                    console.log(`set folder ${message.folder}`)
+                    drive = message.folder;
+                    dirContent = getDirListFromPortfolio();
+console.log(dirContent);
+                    reply = {
+                        command: 'dir',
+                        files: dirContent
+                    };
+                    clients.forEach(client => client.send(JSON.stringify(reply)));
+
                     break;
                 default:
                     console.log('Unknown command:', message.command);
@@ -159,17 +202,22 @@ function sendToWebsite(data) {
 
 function getIP() {
     const ifaces = require('os').networkInterfaces();
+    let address;
     for (const dev in ifaces) {
-        const address = ifaces[dev].find(details => details.family === 'IPv4' && !details.internal)?.address;
-        if (address) {
-            return address;
+        if (dev.startsWith('wlan')) {
+            const iface = ifaces[dev].find(details => details.family === 'IPv4' && !details.internal);
+            if (iface) {
+                address = iface.address;
+                break;
+            }
         }
     }
+    return address;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-function getDirList() {
+function getDirListFromPortfolio() {
     const action = config.listCommand.replace('<drive>', drive);
     try {
         const res = execSync(action, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().split('\n').filter(Boolean).slice(2);
