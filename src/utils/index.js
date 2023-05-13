@@ -4,32 +4,33 @@ const config = require('../config');
 const ifaces = require('os').networkInterfaces();
 
 /**
- * Retrieves the IP address of the wlan network interface.
+ * Retrieves the IP address of the wlan, usb  network interface.
  * @returns {string|null} IP address of the wlan interface, or null if not found.
  */
 
 const getIP = () => {
-  let address;
-  for (const dev in ifaces) {
-    if (dev.startsWith('wlan')) {
-      const iface = ifaces[dev].find(
-        (details) => details.family === 'IPv4' && !details.internal
-      );
-      if (iface) {
-        address = iface.address;
-        break;
+  const ifaces = os.networkInterfaces();
+  const types = ['wlan', 'usb'];
+
+  for (let type of types) {
+    for (let dev of Object.keys(ifaces)) {
+      if (dev.startsWith(type)) {
+        const iface = ifaces[dev].find(
+          details => details.family === 'IPv4' && !details.internal
+        );
+
+        if (iface) return iface.address;
       }
     }
   }
-  return address;
 };
-
 
 /**
  * Gets the directory list from the Portfolio drive.
  * @returns {Array<string>} An array of strings representing the directory content.
  */
 
+// FYI: rpfolio does not return an error if a folder does not exists...
 const getDirListFromPortfolio = () => {
   const action = config.listCommand.replace('<drive>', config.drive);
   try {
