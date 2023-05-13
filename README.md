@@ -13,7 +13,7 @@ NodeJS daemon that helps to upload and download files from a Pi to a Atari Portf
 - This is Raspberry Pi web server that makes transferring files to the Atari Portfolio easier.
 - It is based on NodeJS.
 
-To see the latest changes to the library please take a look at the [Changelog](https://github.com/LennartHennigs/Button2/blob/master/CHANGELOG.md).
+To see the latest changes to the library please take a look at the [Changelog](https://github.com/LennartHennigs/PiPortfolioDaemon/blob/master/CHANGELOG.md).
 
 If you find this library helpful please consider giving it a ⭐️ at [GitHub](https://github.com/LennartHennigs/Button2) and/or [buy me a ☕️](https://ko-fi.com/lennart0815).
 
