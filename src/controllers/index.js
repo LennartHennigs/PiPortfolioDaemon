@@ -6,6 +6,7 @@ const fs = require('fs');
 
 const config = require('../config');
 const { receiveFile } = require('../utils');
+const { sendToWebsite } = require('../websockets');
 
 /**
  * Sends the homepage as a response.
@@ -33,25 +34,31 @@ const serveStaticFiles = (req, res) => {
  */
 const downloadFile = (req, res) => {
   const fileName = req.params.filename;
-  console.log(`download ${fileName}`);
-  // get the file from the portfolio and send it
-  if(receiveFile(fileName)) {
-    const filePath = path.join(__dirname, fileName);
+  process.stdout.write(`- downloading ${fileName} from Portfolio `);
+  
+  if (receiveFile(fileName)) {
+    const filePath = path.join('./', fileName);
+    sendToWebsite(`\u{2b07} ${fileName} `);
+    
     res.download(filePath, fileName, (err) => {
       if (err) {
-        res.status(500).send(`Error downloading the file: ${fileName}`);
-        console.log(err);
-      } else {
-        console.log('download ok');
-        try {
-          fs.unlinkSync(filePath);
-        } catch (error) {
-          console.error('Error during deletion:', error.message);
-        }
+        console.error(err);
+        return res.status(500).send(`Error downloading the file: ${fileName}`);
+      }
+      
+      try {
+        fs.unlinkSync(filePath);
+        sendToWebsite('\u{2705}\n');
+        console.log('\u{2705}');
+      } catch (error) {
+        console.error('Error during deletion:', error.message);
+        sendToWebsite('\u{274c}\n');
+        console.log('\u{274c}');
       }
     });
   }
 };
+
 
 ///////////////////////////////////////////////////////////////////////////////
 module.exports = { getHomePage, serveStaticFiles, downloadFile };

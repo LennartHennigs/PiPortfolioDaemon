@@ -11,24 +11,24 @@ const { sendToWebsite } = require('../websockets');
  * transfers them to the specified drive.
  */
 function setupDaemon() {
-    const watcher = chokidar.watch(config.sharedFolder, {
+    chokidar.watch(config.sharedFolder, {
         ignored: /(^|[\/\\])\../,
         persistent: true,
         awaitWriteFinish: true
-    });
-    watcher.on('add', async (fn, stats) => {
-        const fileName = path.basename(fn);
-        const str = `- ${fileName} `;
-        sendToWebsite(str);
-        process.stdout.write(str);
+    }).on('add', async (filePath) => {
+        const fileName = path.basename(filePath);
+        sendToWebsite(`\u{2b06} ${fileName} `);
+        process.stdout.write(`- uploading ${fileName} to Portfolio `);
+
         try {
-            const res = await transferFile(fn) ? '\u{2705}' : '\u{274c}';
-            console.log(res);
-            sendToWebsite(res + '\n');
-            process.stdout.write(config.BEEP);
+            await transferFile(filePath);
+            console.log(`\u{2705}`);
+            sendToWebsite(`\u{2705}\n`);
         } catch (error) {
-            console.error(`Error during transfer or deletion: ${error.message}`);
+            console.log(`\u{274c}`);
+            sendToWebsite(`\u{274c}\n`);
         }
+        process.stdout.write(config.BEEP);
     });
 }
 
@@ -39,21 +39,19 @@ function setupDaemon() {
  * @param {string} fn - The file path to transfer.
  * @returns {boolean} - True if the transfer was successful, false otherwise.
  */
-const transferFile = (fn) => {
-    let success = false;
+const transferFile = (filePath) => {
     try {
-        if (!fs.existsSync(fn)) {
-            console.error(`File does not exist: ${fn}`);
-            return false;
+        if (!fs.existsSync(filePath)) {
+            throw new Error(`File does not exist: ${filePath}`);
         }
-        const action = config.transferCommand.replace('<file>', fn).replace('<drive>', config.drive);
+        const action = config.transferCommand.replace('<file>', filePath).replace('<drive>', config.drive);
         execSync(action, { stdio: ['ignore', 'pipe', 'ignore'] });
-        fs.unlinkSync(fn);
-        success = true;
+        fs.unlinkSync(filePath);
+        return true;
     } catch (error) {
-        console.error(error.message.includes('exist') ? `File does not exist: ${fn}` : error.message);
+        console.error(error.message.includes('exist') ? `File does not exist: ${filePath}` : '');
+        return false;
     }
-    return success;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
