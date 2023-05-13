@@ -10,6 +10,7 @@ const config = {
     webserverPath: path.join(process.cwd(), 'public'),
     homepage: path.join(process.cwd(), 'public', 'rpf.html'),
     sharedFolder: path.join(process.cwd(), 'upload'),
+    tmpFolder: "/tmp",
     // !!! TODO: be better w/ *.*
     listCommand: './rpfolio2 -l <drive>*.*',
     receiveCommand: './rpfolio2 -r -f <drive><file> .',
