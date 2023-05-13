@@ -16,7 +16,7 @@ LH 05/2023
 - It provided a web interface to change the target folder.
 - There you can also donwload files.
 
-![preview](images/preview.png)
+<kbd><img src="images/preview.png" /></kbd>
 
 ## Prerequisites
 
@@ -26,5 +26,5 @@ LH 05/2023
 - A shared SAMBA folder on the Pi
 - NodeJS
 
-![Pi to Portfolio](images/platine2.png)
+<kbd><img src="images/platine2.png" /></kbd>
 
