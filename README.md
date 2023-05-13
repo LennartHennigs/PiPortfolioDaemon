@@ -31,10 +31,11 @@ Thank you!
 
 ## Prerequisites
 
-- Pi Zero
-- Pi to Atari Portfolio Parallel adapter (built my own)
+- Atari Portfolio with Parallel Adapter
+- Raspberry Pi (Zero)
+- Pi to Atari Portfolio Parallel adapter (Ibuilt my own, see picture below)
 - [rpfolio](https://github.com/LennartHennigs/transfolio) (Transfolio for the Pi)
 - A shared SAMBA folder on the Pi
-- NodeJS
+- NodeJS installed on the Pi
 
 <kbd><img src="images/platine2.png" /></kbd>
