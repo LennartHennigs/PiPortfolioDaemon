@@ -19,13 +19,13 @@ If you find this library helpful please consider giving it a ⭐️ at [GitHub](
 
 Thank you!
 
-
 ## Functions
 
 - It watches a shared SAMBA folder for files for uploads.
-- If files are detected it tries to send them via [rpfolio](https://github.com/LennartHennigs/transfolio) to the Atari Portfolio.
+- If files are detected in it sends them via [rpfolio](https://github.com/LennartHennigs/transfolio) to the Atari Portfolio.
 - It provided a web interface to change the target folder.
-- There you can also donwload files.
+- You can also download files from the web interface.
+- It also provides a list history of the file transfers.
 
 <kbd><img src="images/preview.png" /></kbd>
 
@@ -39,3 +39,4 @@ Thank you!
 - NodeJS installed on the Pi
 
 <kbd><img src="images/platine2.png" /></kbd>
+<kbd><img src="images/platine1.png" /></kbd>
