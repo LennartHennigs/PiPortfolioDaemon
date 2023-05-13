@@ -7,19 +7,23 @@
     <link rel="stylesheet" href="styles.css" type="text/css">
 </head>
 <body>
-<h1>Atari Portfolio</h1>
+<img id="logo" src="logo.png">
+<h1>File Transfer</h1>
 
-<label for="current_folder">Folder:</label>
-<input type="text" id="current_folder" name="current_folder">
-<button type="submit" onclick="sendFolder()">Submit</button>
-<button id="clear" name="clear" onclick="document.getElementById('log').value = ''">Clear</button>
-<div id="dir_container">
-    <h3>File list:</h3>
-    <ul id="file_list"></ul>
+<div class="content">
+    <div class="column1">
+        <label for="current_folder">Folder</label>
+        <input type="text" id="current_folder" name="current_folder">
+        <button type="submit" onclick="sendFolder()">Submit</button>
+        <div id="dir_container">
+            <ul id="file_list"></ul>
+        </div>
+    </div>
+    <div class="column2">
+        <button id="clear" name="clear" onclick="document.getElementById('log').value = ''">Clear</button>
+        <textarea id="log" name="log" readonly="readonly"></textarea>
+    </div>
 </div>
-
-<br>
-<textarea id="log" name="log" cols="60" rows="10" readonly="readonly"></textarea>
 
 
 <script src="rpf.js" type="application/javascript"></script>

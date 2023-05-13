@@ -7,55 +7,14 @@ const port = 40510;
 ///////////////////////////////////////////////////////////////////////////////
 
 if (typeof window.WebSocket === 'undefined') {
-    alert('Websockets are not supported');
+    alert('Web sockets are not supported');
 } else {
     let ws;
     connectWebSocket();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// adds event listeners to the websockets
-
-/*
-function connectWebSocket() {
-  const ws = new WebSocket(`ws://${location.hostname}:${port}`);
-
-  ws.onopen = () => {
-    console.log('Connected to server!');
-    ws.send(JSON.stringify({ command: 'page_loaded' }));
-    initializeInputEvents();
-  };
-
-  ws.onmessage = (event) => {
-    const msg = JSON.parse(event.data);
-    if (debug) console.log(msg);
-
-    const commands = {
-      log: updateLog,
-      set_folder: getFolder,
-      dir: populateFileList
-    };
-
-    const handler = commands[msg.command] || (() => console.log('error'));
-    handler(msg.data);
-  };
-
-  ws.onerror = () => {
-    console.log('WebSocket error');
-    alert('Error connecting to WebSocket. The page will now reload.');
-    location.reload();
-  };
-
-  ws.onclose = () => {
-    console.log('Disconnected!!');
-    alert('WebSocket connection lost. The page will now reload.');
-    setTimeout(() => {
-      location.reload();
-    }, 5000);
-  };
-}
-
-*/
+// adds event listeners to the web sockets
 
 function connectWebSocket() {
     ws = new WebSocket(`ws://${location.hostname}:${port}`);
@@ -70,7 +29,7 @@ function connectWebSocket() {
         if (debug) console.log(msg);
 
         switch (msg.command) {
-            case 'log':
+            case 'add_to_log':
                 updateLog(msg.data);
                 break;
             case 'set_folder':
@@ -145,7 +104,6 @@ function updateLog(data) {
 // send a new folder string to the server
 function sendFolder() {
     const folder = document.getElementById('current_folder').value;
-    console.log("SEND FOLDER");
     const message = {
         command: 'set_folder',
         folder,

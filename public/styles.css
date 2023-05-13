@@ -1,3 +1,91 @@
-#log {
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font: 16px Arial, sans-serif;
+    padding: 20px;
+    background-color: #fff;
+    color: #333;
+    scroll-behavior: smooth;
+}
+
+h1 {
+    font-size: 16pt;
+    padding-bottom: 20px;
+}
+
+button, input[type="submit"], input[type="button"] {
+    padding: 5px;
+    color: #f5f5f5;
+    background: #ba55d3;    
     border: 0;
+    border-radius: 3px;
+}
+
+li {
+    list-style: none;    
+    padding: 1px;
+}
+
+label {
+    display: none;
+}
+
+.content {
+    display: flex;
+    padding: 20px;
+}
+
+.column1 {
+    flex: 0 0 40%;
+}
+
+.column2 {
+    flex: 1;
+    border-left: 1px solid #333;
+    text-align: right;
+}
+
+#logo {
+    width: 400px;
+}
+
+#current_folder, #dir_container {
+    margin-left: 10px;
+    font: 11pt 'Courier New', Courier, monospace;
+    border: 1px solid #333 ;
+    border-radius: 3px;
+}
+
+#current_folder {
+    height: 25px;
+}
+
+#dir_container {
+    margin-top: 10px;
+    border: 0;
+}
+
+#dir_container a {
+    text-decoration: none;
+}
+
+#dir_container a:hover {
+    text-decoration: underline;
+}
+
+#dir_container a:visited {
+    color: blue;
+}
+
+#log {
+    width: 100%;
+    min-height: 500px;
+    border: 0;
+    font-size: 12pt;
+    padding-left: 20px;
+    font-family: 'Courier New', Courier, monospace;
 }
