@@ -16,6 +16,47 @@ if (typeof window.WebSocket === 'undefined') {
 ///////////////////////////////////////////////////////////////////////////////
 // adds event listeners to the websockets
 
+/*
+function connectWebSocket() {
+  const ws = new WebSocket(`ws://${location.hostname}:${port}`);
+
+  ws.onopen = () => {
+    console.log('Connected to server!');
+    ws.send(JSON.stringify({ command: 'page_loaded' }));
+    initializeInputEvents();
+  };
+
+  ws.onmessage = (event) => {
+    const msg = JSON.parse(event.data);
+    if (debug) console.log(msg);
+
+    const commands = {
+      log: updateLog,
+      set_folder: getFolder,
+      dir: populateFileList
+    };
+
+    const handler = commands[msg.command] || (() => console.log('error'));
+    handler(msg.data);
+  };
+
+  ws.onerror = () => {
+    console.log('WebSocket error');
+    alert('Error connecting to WebSocket. The page will now reload.');
+    location.reload();
+  };
+
+  ws.onclose = () => {
+    console.log('Disconnected!!');
+    alert('WebSocket connection lost. The page will now reload.');
+    setTimeout(() => {
+      location.reload();
+    }, 5000);
+  };
+}
+
+*/
+
 function connectWebSocket() {
     ws = new WebSocket(`ws://${location.hostname}:${port}`);
     ws.addEventListener('open', () => {
@@ -50,7 +91,6 @@ function connectWebSocket() {
         location.reload();
     });
 
-
     ws.addEventListener('close', () => {
         ws = null;
         console.log('Disconnected!!');
@@ -61,7 +101,6 @@ function connectWebSocket() {
         }, 5000);
     });
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
