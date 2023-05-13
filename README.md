@@ -25,7 +25,7 @@ Thank you!
 - If files are detected in it sends them via [rpfolio](https://github.com/LennartHennigs/transfolio) to the Atari Portfolio.
 - It provided a web interface to change the target folder.
 - You can also download files from the web interface.
-- It also provides a list history of the file transfers.
+- It also displays a history of the file transfers.
 
 <kbd><img src="images/preview.png" /></kbd>
 <kbd><img src="images/output.png" width="400px" /></kbd>
