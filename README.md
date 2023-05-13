@@ -28,7 +28,7 @@ Thank you!
 - It also provides a list history of the file transfers.
 
 <kbd><img src="images/preview.png" /></kbd>
-<kbd><img src="images/output.png" width="600px" /></kbd>
+<kbd><img src="images/output.png" width="400px" /></kbd>
 
 ## Prerequisites
 
