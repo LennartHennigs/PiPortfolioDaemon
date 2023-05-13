@@ -15,20 +15,20 @@ const setupWebSockets = () => {
     wsServer.on('connection', (ws) => {
         ws.binaryType = 'arraybuffer';
         clients.push(ws);
-        console.log(`client connected: ${clients.length}`);
+//        console.log(`- client connected: ${clients.length}`);
 
         ws.on('message', (event) => {
             const message = JSON.parse(event);
             let reply;
             switch (message.command) {
                 case 'page_loaded':
-                    console.log("- Page was loaded");
+                    console.log("- web page was loaded");
                     sendSetFolder(config.drive + '\\');
                     sendDirList();
                     break;
                 case 'set_folder':
                     // Handle the 'set_folder' command here
-                    console.log(`set folder ${message.folder}`)
+                    console.log(`- setting Portfolio folder: ${message.folder}`)
                     config.drive = message.folder;
                     config.dirContent = getDirListFromPortfolio();
                     sendDirList();
@@ -40,7 +40,7 @@ const setupWebSockets = () => {
 
         ws.on('close', () => {
             clients = clients.filter(client => client !== ws);
-            console.log(`client disconnected: ${clients.length}`);
+//            console.log(`- client disconnected: ${clients.length}`);
         });
     });
 };
@@ -77,7 +77,7 @@ function sendSetFolder(folder) {
  */
 const sendToWebsite = (message) => {
     const newMessage = {
-        command: 'log',
+        command: 'add_to_log',
         data: message
     };
     clients.forEach(item => item.send(JSON.stringify(newMessage)));
