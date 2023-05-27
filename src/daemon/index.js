@@ -4,7 +4,7 @@ const fs = require('fs');
 const { execSync } = require('child_process');
 
 const config = require('../config');
-const { sendToWebsite } = require('../websockets');
+const { sendToWebsite, sendToActivityLog, sendDirList } = require('../websockets');
 
 /**
  * Sets up a daemon to watch for added files in the shared folder and
@@ -17,18 +17,19 @@ function setupDaemon() {
         awaitWriteFinish: true
     }).on('add', async (filePath) => {
         const fileName = path.basename(filePath);
-        sendToWebsite(`\u{2b06} ${fileName} `);
+        sendToActivityLog(`\u{2b06} ${fileName} `);
         process.stdout.write(`- uploading ${fileName} to Portfolio `);
 
         try {
             await transferFile(filePath);
             console.log(`\u{2705}`);
-            sendToWebsite(`\u{2705}\n`);
+            sendToActivityLog(`\u{2705}\n`);
         } catch (error) {
             console.log(`\u{274c}`);
-            sendToWebsite(`\u{274c}\n`);
+            sendToActivityLog(`\u{274c}\n`);
         }
         process.stdout.write(config.BEEP);
+        sendDirList();
     });
 }
 
