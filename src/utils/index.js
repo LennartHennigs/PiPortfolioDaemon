@@ -40,7 +40,8 @@ const getDirListFromPortfolio = () => {
       .toString()
       .split('\n')
       .filter(Boolean)
-      .slice(2);
+      .slice(2)
+      .sort();
     return res;
   } catch (error) {
     console.error('Error getting dir list:', error.message);
