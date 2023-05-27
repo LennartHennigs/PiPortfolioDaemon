@@ -6,9 +6,9 @@ const config = {
     appPort: 3000,
     wsPort: 40510,
     drive: null,
-    webserverPath: path.join(process.cwd(), 'public'),
-    homepage: path.join(process.cwd(), 'public', 'rpf.html'),
-    sharedFolder: path.join(process.cwd(), 'upload'),
+    webserverPath: path.join(__dirname, '../..', 'public'),
+    homepage: path.join(__dirname, '../..', 'public', 'rpf.html'),
+    sharedFolder: path.join(__dirname, '../../..', 'upload'),
     tmpFolder: "/tmp",
     // !!! TODO: be better w/ *.*
     listCommand: 'rpfolio -l <drive>*.*',
