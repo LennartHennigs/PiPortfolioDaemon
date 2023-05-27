@@ -7,7 +7,7 @@
 body {
     font: 16px Arial, sans-serif;
     padding: 20px;
-    background-color: #fff;
+    background-color: #F5F5F5;
     color: #333;
     scroll-behavior: smooth;
 }
@@ -15,6 +15,10 @@ body {
 h1 {
     font-size: 16pt;
     padding-bottom: 20px;
+    margin: -10px 0 0 65px;
+}
+input, textarea {
+    background-color: #F5F5F5;
 }
 
 button, input[type="submit"], input[type="button"] {
@@ -56,17 +60,21 @@ label {
 #current_folder, #dir_container {
     margin-left: 10px;
     font: 11pt 'Courier New', Courier, monospace;
-    border: 1px solid #333 ;
+    border: 1px solid #808080 ;
     border-radius: 3px;
 }
 
 #current_folder {
     height: 25px;
+    width: 75%;
 }
 
 #dir_container {
     margin-top: 10px;
+    min-height: 400px;
+    max-height: 400px;
     border: 0;
+    overflow-y: scroll;
 }
 
 #dir_container a {
@@ -91,18 +99,37 @@ label {
 }
 
 #drop_zone {
-    width: 300px;
-    height: 200px;
+    height: 80px;
     border: 2px dashed #bbb;
     border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 10px;
+    margin: 20px 10px 0 10px;
+    padding: 0;
+}
+
+#file_submit {
+    margin-top: 10px;
+}
+
+.header-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 #drop_zone.over {
     background-color: lightgreen;
     /* You can add more styles here... */
+}
+
+#upload_form {
+    text-align: center;
 }

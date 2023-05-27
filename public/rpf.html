@@ -8,31 +8,33 @@
     <link href="favicon.ico" rel="icon" type="image/x-icon" />
 </head>
 <body>
-<img id="logo" src="logo.png">
-<h1>File Transfer</h1>
-
-<div class="content">
-    <div class="column1">
-        <label for="current_folder">Folder</label>
-        <input type="text" id="current_folder" name="current_folder">
-        <button type="submit" onclick="sendFolder()">Submit</button>
-        <div id="dir_container">
-            <ul id="file_list"></ul>
-        </div>
-        </div>
-    <div class="column2">
-        <button id="clear" name="clear" onclick="document.getElementById('log').value = ''">Clear</button>
-        <textarea id="log" name="log" readonly="readonly"></textarea>
-        </div>
-        <div>
-            <div id="drop_zone">Drop files here</div>
-                <form action="/upload" method="post" enctype="multipart/form-data">
-                    Select file to upload:
-                    <input type="file" name="filesToUpload" id="filesToUpload">
-                    <input type="submit" value="Upload File" name="submit">
-                </form>
+    <div class="header-wrapper">
+        <img id="logo" src="logo.png">
+        <h1>File Transfer</h1>
+    </div>
+    <div class="content">
+        <div class="column1">
+            <label for="current_folder">Folder</label>
+            <input type="text" id="current_folder" name="current_folder">
+            <button type="submit" onclick="sendFolder()">Submit</button>
+            <div id="dir_container">
+                <ul id="file_list"></ul>
             </div>
-</div>
-<script src="rpf.js" type="application/javascript"></script>
+            <div id="upload_form">
+                <div id="drop_zone">
+                    <form action="/upload" method="post" enctype="multipart/form-data">
+                        <input type="file" name="filesToUpload" id="filesToUpload">
+                        <br />
+                        <input type="submit" value="Upload File" id="file_submit" name="submit">
+                    </form>
+                </div>
+            </div>    
+        </div>
+        <div class="column2">
+            <button id="clear" name="clear" onclick="document.getElementById('log').value = ''">Clear</button>
+            <textarea id="log" name="log" readonly="readonly"></textarea>
+            </div>
+    </div>
+    <script src="rpf.js" type="application/javascript"></script>
 </body>
 </html>
