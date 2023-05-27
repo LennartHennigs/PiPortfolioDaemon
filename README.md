@@ -54,12 +54,14 @@ To fix this, I wanted to provide an easy way to transfer data to the Portfolio f
 
 - connect the Pi to the Portfolio
 - run the transfer system util on the Portfolio (in server mode)
+  - `Atari + S >  F > S`
 - copy the project files onto your Pi
-- set up a publis SAMBA share for the `upload/` folder (optional)
-- install NodeJS on your Pi
-- run the server via `node server.js`
+  - `git clone https://github.com/LennartHennigs/PiPortfolioDaemon.git`
+- [set up a public SAMBA share](https://pimylifeup.com/raspberry-pi-samba/) for the `~/PiPortfolioDaemon/upload/` folder (optional)
+- [install NodeJS on your Pi](https://gist.github.com/davps/6c6e0ba59d023a9e3963cea4ad0fb516)
+- run the server via `node ~/PiPortfolioDaemon/server.js`
 - open `[ip address of your Pi]:3000` in your browser
-- browse away
+- transfer away
 
 <kbd><img src="images/platine2.png" /></kbd>
 <kbd><img src="images/platine1.png" /></kbd>
