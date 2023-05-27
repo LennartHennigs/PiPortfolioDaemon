@@ -11,7 +11,7 @@ const config = {
     sharedFolder: path.join(process.cwd(), 'upload'),
     tmpFolder: "/tmp",
     // !!! TODO: be better w/ *.*
-    listCommand: 'pfolio -l <drive>*.*',
+    listCommand: 'rpfolio -l <drive>*.*',
     receiveCommand: 'rpfolio -r -f <drive><file> .',
     transferCommand: 'rpfolio -f -t <file> <drive>',
     ID: 'Portfolio Folder Daemon',
