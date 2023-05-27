@@ -1,3 +1,5 @@
+///////////////////////////////////////////////////////////////////////////////
+
 const WebSocket = require('ws');
 
 const config = require('../config');
@@ -5,6 +7,7 @@ const { getDirListFromPortfolio } = require('../utils');
 
 let clients = [];
 
+///////////////////////////////////////////////////////////////////////////////
 /**
  * Sets up a WebSocket server and handles client connections.
  * @function setupWebSockets
@@ -30,7 +33,6 @@ const setupWebSockets = () => {
                     // Handle the 'set_folder' command here
                     console.log(`- setting Portfolio folder: ${message.folder}`)
                     config.drive = message.folder;
-                    config.dirContent = getDirListFromPortfolio();
                     sendDirList();
                     break;
                 default:
@@ -45,6 +47,7 @@ const setupWebSockets = () => {
     });
 };
   
+///////////////////////////////////////////////////////////////////////////////
 /**
  * Sends the new folder name to the HTML page.
  * @param {string} folder - The folder name to send.
@@ -52,11 +55,12 @@ const setupWebSockets = () => {
 function sendDirList() {
     const newMessage = {
         command: 'dir',
-        files: config.dirContent
+        files: getDirListFromPortfolio()
     };
     clients.forEach(client => client.send(JSON.stringify(newMessage)));
 }
 
+///////////////////////////////////////////////////////////////////////////////
 /**
  * Sends the new folder name to the HTML page.
  * @param {string} folder - The folder name to send.
@@ -71,11 +75,12 @@ function sendSetFolder(folder) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
 /**
  * Sends a message to the connected clients.
  * @param {string} message - The message to send.
  */
-const sendToWebsite = (message) => {
+const sendToActivityLog = (message) => {
     const newMessage = {
         command: 'add_to_log',
         data: message
@@ -84,6 +89,6 @@ const sendToWebsite = (message) => {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-module.exports = { setupWebSockets, sendToWebsite };
+module.exports = { setupWebSockets, sendToActivityLog, sendDirList };
 ///////////////////////////////////////////////////////////////////////////////
   
