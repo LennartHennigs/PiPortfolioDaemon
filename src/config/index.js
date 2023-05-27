@@ -6,7 +6,6 @@ const config = {
     appPort: 3000,
     wsPort: 40510,
     drive: null,
-    dirContent: [],
     webserverPath: path.join(process.cwd(), 'public'),
     homepage: path.join(process.cwd(), 'public', 'rpf.html'),
     sharedFolder: path.join(process.cwd(), 'upload'),

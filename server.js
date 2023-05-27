@@ -17,14 +17,15 @@ console.log(`-> ${config.drive}\n`);
 
 // Get directory contents from the portfolio
 console.log('Getting dir contents...');
-config.dirContent = getDirListFromPortfolio();
 console.log();
+
+// console.log(config);
 
 // Start the app and set up websockets and the daemon
 app.listen(PORT, () => {
     const address = getIP();
     console.log(`Webserver running at http://${address}:${config.appPort}`);
- 
+    
     setupWebSockets();
     setupDaemon();
 });
