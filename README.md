@@ -1,13 +1,13 @@
 # PiPortfolioDaemon
 
+*Disclaimer*: This is a work in progress!
+
 - Author: Lennart Hennigs (<https://www.lennarthennigs.de>)
 - Copyright (C) 2023 Lennart Hennigs.
 - Released under the MIT license.
 
-*Disclaimer*: This is a work in progress!
 
 - To see the latest changes look at the [Changelog](https://github.com/LennartHennigs/PiPortfolioDaemon/blob/master/CHANGELOG.md).
-
 - If you find this library helpful please consider giving it a ⭐️ at [GitHub](https://github.com/LennartHennigs/Button2) and/or [buy me a ☕️](https://ko-fi.com/lennart0815).
 
 Thank you!
