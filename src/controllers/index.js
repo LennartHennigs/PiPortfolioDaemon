@@ -6,8 +6,12 @@ const fs = require('fs');
 
 const config = require('../config');
 const { receiveFile } = require('../utils');
-const { sendToWebsite } = require('../websockets');
+const { sendToActivityLog, sendDirList } = require('../websockets');
 
+const multer  = require('multer');
+const upload = multer({ dest: config.sharedFolder });
+
+///////////////////////////////////////////////////////////////////////////////
 /**
  * Sends the homepage as a response.
  * @param {object} req - Express request object.
@@ -17,6 +21,7 @@ const getHomePage = (req, res) => {
   res.sendFile(config.homepage);
 };
 
+///////////////////////////////////////////////////////////////////////////////
 /**
  * Serves static files (html, css, js) requested by the client.
  * @param {object} req - Express request object.
@@ -27,6 +32,7 @@ const serveStaticFiles = (req, res) => {
   res.sendFile(filePath);
 };
 
+///////////////////////////////////////////////////////////////////////////////
 /**
  * Handles the download of a file from the server.
  * @param {object} req - Express request object.
@@ -38,7 +44,7 @@ const downloadFile = (req, res) => {
   
   if (receiveFile(fileName)) {
     const filePath = path.join('./', fileName);
-    sendToWebsite(`\u{2b07} ${fileName} `);
+    sendToActivityLog(`\u{2b07} ${fileName} `);
     
     res.download(filePath, fileName, (err) => {
       if (err) {
@@ -48,18 +54,27 @@ const downloadFile = (req, res) => {
       
       try {
         fs.unlinkSync(filePath);
-        sendToWebsite('\u{2705}\n');
+        sendToActivityLog('\u{2705}\n');
         console.log('\u{2705}');
       } catch (error) {
         console.error('Error during deletion:', error.message);
-        sendToWebsite('\u{274c}\n');
+        sendToActivityLog('\u{274c}\n');
         console.log('\u{274c}');
       }
     });
   }
 };
 
+///////////////////////////////////////////////////////////////////////////////
+
+const uploadFile = (req, res) => {
+  const file = req.file;
+  if (!file) {
+    return res.status(400).send('No file uploaded.');
+  }
+  res.redirect('/');
+};
 
 ///////////////////////////////////////////////////////////////////////////////
-module.exports = { getHomePage, serveStaticFiles, downloadFile };
+module.exports = { getHomePage, serveStaticFiles, downloadFile, uploadFile };
 ///////////////////////////////////////////////////////////////////////////////
