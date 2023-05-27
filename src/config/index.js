@@ -11,11 +11,11 @@ const config = {
     sharedFolder: path.join(process.cwd(), 'upload'),
     tmpFolder: "/tmp",
     // !!! TODO: be better w/ *.*
-    listCommand: './rpfolio2 -l <drive>*.*',
-    receiveCommand: './rpfolio2 -r -f <drive><file> .',
-    transferCommand: './rpfolio2 -f -t <file> <drive>',
+    listCommand: 'pfolio -l <drive>*.*',
+    receiveCommand: 'rpfolio -r -f <drive><file> .',
+    transferCommand: 'rpfolio -f -t <file> <drive>',
     ID: 'Portfolio Folder Daemon',
-    VERSION: 'v0.9 - LH 05/2023',
+    VERSION: 'v1.0 - LH 05/2023',
     BEEP: '\u0007',
 };
 
