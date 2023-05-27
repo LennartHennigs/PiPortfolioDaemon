@@ -89,3 +89,20 @@ label {
     padding-left: 20px;
     font-family: 'Courier New', Courier, monospace;
 }
+
+#drop_zone {
+    width: 300px;
+    height: 200px;
+    border: 2px dashed #bbb;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+}
+
+#drop_zone.over {
+    background-color: lightgreen;
+    /* You can add more styles here... */
+}
