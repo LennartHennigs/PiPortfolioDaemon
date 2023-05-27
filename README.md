@@ -52,7 +52,14 @@ To fix this, I wanted to provide an easy way to transfer data to the Portfolio f
 
 ## How To Use
 
-- copy files on 
+- connect the Pi to the Portfolio
+- run the transfer system util on the Portfolio (in server mode)
+- copy the project files onto your Pi
+- set up a publis SAMBA share for the `upload/` folder (optional)
+- install NodeJS on your Pi
+- run the server via `node server.js`
+- open `[ip address of your Pi]:3000` in your browser
+- browse away
 
 <kbd><img src="images/platine2.png" /></kbd>
 <kbd><img src="images/platine1.png" /></kbd>
