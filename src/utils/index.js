@@ -1,8 +1,15 @@
-const os = require('os');
-const { execSync } = require('child_process');
-const config = require('../config');
-const ifaces = require('os').networkInterfaces();
+///////////////////////////////////////////////////////////////////////////////
 
+const config = require('../config');
+
+const os = require('os');
+const fs = require('fs');
+const ifaces = require('os').networkInterfaces();
+const { execSync } = require('child_process');
+
+const portfolioUtils = require('./portfolioUtils');
+
+///////////////////////////////////////////////////////////////////////////////
 /**
  * Retrieves the IP address of the wlan, usb  network interface.
  * @returns {string|null} IP address of the wlan interface, or null if not found.
@@ -25,48 +32,40 @@ const getIP = () => {
   }
 };
 
+///////////////////////////////////////////////////////////////////////////////
 /**
- * Gets the directory list from the Portfolio drive.
- * @returns {Array<string>} An array of strings representing the directory content.
+ * Checks if a given path exists.
+ *
+ * @param {string} path - The path to be checked.
+ * @returns {boolean} True if the path exists, false otherwise.
  */
 
-// FYI: rpfolio does not return an error if a folder does not exists...
-const getDirListFromPortfolio = () => {
-  const action = config.listCommand.replace('<drive>', config.drive);
+function doesPathExists(path) {
   try {
-    const res = execSync(action, {
-      stdio: ['ignore', 'pipe', 'ignore'],
-    })
-      .toString()
-      .split('\n')
-      .filter(Boolean)
-      .slice(2)
-      .sort();
-    return res;
-  } catch (error) {
-    console.error('Error getting dir list:', error.message);
+      fs.accessSync(path, fs.constants.F_OK);
+      return true;
+  } catch (err) {
+      return false;
   }
-};
-
-/**
- * Receives a file from the Portfolio drive and stores it locally.
- * @param {string} fn - The filename to be received.
- * @returns {boolean} True if the file transfer was successful, false otherwise.
- */
-
-const receiveFile = (fn) => {
-  try {
-    const action = config.receiveCommand
-      .replace('<file>', fn)
-      .replace('<drive>', config.drive);
-    execSync(action, { stdio: ['ignore', 'pipe', 'ignore'] });
-  } catch (error) {
-    console.error('Error during transfer:', error.message);
-    return false;
-  }
-  return true;
-};
+}
 
 ///////////////////////////////////////////////////////////////////////////////
-module.exports = { getIP, getDirListFromPortfolio, receiveFile };
+/**
+ * Checks if a command is available in the system.
+ *
+ * @param {string} command - The command to be checked.
+ * @returns {boolean} True if the command is available, false otherwise.
+ */
+
+function isCommandAvailable(command) {
+  try {
+      execSync(`which ${command}`);
+      return true;
+  } catch (err) {
+      return false;
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+module.exports = { getIP, doesPathExists, isCommandAvailable, ...portfolioUtils };
 ///////////////////////////////////////////////////////////////////////////////
