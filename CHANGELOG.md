@@ -2,6 +2,7 @@
 
 ## 05-28-2023
 
+- detecting portfolio connection error
 - created a separate portfolioUtil.js lib
 - checking if folders and `rpfolio` command exists
 - checking whether web server port is already in use
