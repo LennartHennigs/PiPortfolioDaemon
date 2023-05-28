@@ -85,6 +85,13 @@ function getFolder(folder) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+function clearFileList() {
+    const fileList = document.getElementById('file_list');
+    fileList.innerHTML = '';
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // lists all the files for the folder
 function populateFileList({ files = [] } = {}) {
     const fileList = document.getElementById('file_list');
@@ -115,6 +122,7 @@ function sendFolder() {
         folder,
     };
     ws.send(JSON.stringify(message));
+    clearFileList();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
