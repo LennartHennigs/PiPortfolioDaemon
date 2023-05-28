@@ -33,7 +33,7 @@ To fix this, I wanted to provide an easy way to transfer data to the Portfolio w
 
 ## Functions
 
-- Provides a web page on `[Pi IP-Address]:3000``
+- Provides a web page on `[Pi IP-Address]:3000`
 - There you can...
   - list folder content on the Portfolio
   - download files
