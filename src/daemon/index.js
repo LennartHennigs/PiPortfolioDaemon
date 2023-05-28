@@ -45,7 +45,7 @@ const transferFile = (filePath) => {
         if (!fs.existsSync(filePath)) {
             throw new Error(`File does not exist: ${filePath}`);
         }
-        const action = config.transferCommand.replace('<file>', filePath).replace('<drive>', config.drive);
+        const action = config.transferCommand.replace('<file>', filePath).replace('<drive>', config.portfolioPath);
         execSync(action, { stdio: ['ignore', 'pipe', 'ignore'] });
         fs.unlinkSync(filePath);
         return true;
