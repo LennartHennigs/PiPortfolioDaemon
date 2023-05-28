@@ -20,13 +20,13 @@ The [Atari Portfolio](https://en.wikipedia.org/wiki/Atari_Portfolio) was the fir
 Using and experiencing one today is hard, as you have hard time putting any files onto it.
 
 - The storage cards it uses are no longer produced ([Bee Cards](https://en.wikipedia.org/wiki/Bee_Card_(game_cartridge))) and kind of rare.
-- To transfer files you need the [Atari Portfolio Parallel Interface](https://www.atari-computermuseum.de/hpc_peri.htm)...
-- ... and a PC that actually still has a parallel port...
+- To transfer files you need the [Atari Portfolio Parallel Interface](https://www.atari-computermuseum.de/hpc_peri.htm),...
+- ... and a PC that actually still has a parallel port,...
 - ... and a transfer program like [transfolio](http://www.pofowiki.de/doku.php?id=software:vorstellung:exchanges:transfolio)
 
-Without the above the Atari is only a pretty plastic brick.
+Without the above, the Atari is mostly a pretty plastic brick that you cannot access.
 
-To fix this, I wanted to provide an easy way to transfer data to the Portfolio for modern computers.
+To fix this, I wanted to provide an easy way to transfer data to the Portfolio with modern computers.
 ## Functions
 
 - Provides a web page on `[Pi IP-Address]:3000``
@@ -34,8 +34,9 @@ To fix this, I wanted to provide an easy way to transfer data to the Portfolio f
   - list folder content on the Portfolio
   - download files
   - upload files
-  - see an activitiy log
+  - see an activity log
 - In addition, it watches a shared SAMBA folder for uoloaded files to send them to the Portfolio.
+- It also detects whether the connection to the Portfolio has timed out
 
 
 <kbd><img src="images/preview.png" width="400px" /></kbd>
@@ -45,20 +46,21 @@ To fix this, I wanted to provide an easy way to transfer data to the Portfolio f
 
 - Atari Portfolio with Parallel Interface
 - Raspberry Pi (Zero)
-- Pi to Atari Portfolio Parallel adapter (I built my own, see picture below)
+- Atari Portfolio connected to Pi
 - NodeJS installed on the Pi
-- [rpfolio](https://github.com/LennartHennigs/transfolio) (Transfolio for the Pi) installed on the Pi
+- `rpfolio` installed on the Pi
 - Nice to have: A shared SAMBA folder on the Pi
 
 ## How To Use
 
-- connect the Pi to the Portfolio
+- [connect the Pi to the Portfolio](https://lennarthennigs.de/how-to-connect-an-atari-portfolio/)
 - run the transfer system util on the Portfolio (in server mode)
   - `Atari + S >  F > S`
 - copy the project files onto your Pi
   - `git clone https://github.com/LennartHennigs/PiPortfolioDaemon.git`
 - [set up a public SAMBA share](https://pimylifeup.com/raspberry-pi-samba/) for the `~/upload/` folder (optional)
 - [install NodeJS on your Pi](https://gist.github.com/davps/6c6e0ba59d023a9e3963cea4ad0fb516)
+- build [rpfolio](https://lennarthennigs.de/how-to-connect-an-atari-portfolio/)
 - run the server via `node ~/PiPortfolioDaemon/server.js`
 - open `[ip address of your Pi]:3000` in your browser
 - transfer away
