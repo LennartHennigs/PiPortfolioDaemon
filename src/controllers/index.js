@@ -6,7 +6,7 @@ const fs = require('fs');
 
 const config = require('../config');
 const { receiveFileFromPortfolio } = require('../utils');
-const { sendToActivityLog, sendDirList } = require('../websockets');
+const { sendToActivityLog, sendDirList, sendPortfolioError } = require('../websockets');
 
 const multer  = require('multer');
 const upload = multer({ dest: config.sharedFolder });
@@ -62,6 +62,8 @@ const downloadFile = (req, res) => {
         console.log('\u{274c}');
       }
     });
+  } else {
+    sendPortfolioError();
   }
 };
 

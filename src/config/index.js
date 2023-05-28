@@ -7,6 +7,7 @@ const path = require('path');
 const config = {
     appPort: 3000,
     wsPort: 40510,
+    portfolioTimeout: 4000,
     portfolioPath: 'c:\\',
     webserverFolder: path.join(__dirname, '../..', 'public'),
     homepage: path.join(__dirname, '../..', 'public', 'rpf.html'),

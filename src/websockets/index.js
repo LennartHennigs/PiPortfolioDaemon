@@ -20,6 +20,16 @@ function normalizePortfolioPath(path_str) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+function sendPortfolioError() {
+    const newMessage = {
+        command: 'pofo_error',
+    };
+    clients.forEach(client => client.send(JSON.stringify(newMessage)));
+    // console.log("- PoFo connection error");
+}
+
+///////////////////////////////////////////////////////////////////////////////
 /**
  * Sets up a WebSocket server and handles client connections.
  * @function setupWebSockets
@@ -66,9 +76,14 @@ const setupWebSockets = () => {
  * @param {string} folder - The folder name to send.
  */
 function sendDirList() {
+    const files = getDirListFromPortfolio();
+    if (!files) {
+        sendPortfolioError();
+        return;
+    }
     const newMessage = {
         command: 'dir',
-        files: getDirListFromPortfolio()
+        files: files
     };
     clients.forEach(client => client.send(JSON.stringify(newMessage)));
 }
@@ -101,6 +116,6 @@ const sendToActivityLog = (message) => {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-module.exports = { setupWebSockets, sendToActivityLog, sendDirList };
+module.exports = { setupWebSockets, sendToActivityLog, sendDirList, sendPortfolioError };
 ///////////////////////////////////////////////////////////////////////////////
   

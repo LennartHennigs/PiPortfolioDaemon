@@ -41,6 +41,10 @@ function connectWebSocket() {
                 case 'dir':
                     populateFileList(msg);
                     break;
+                case 'pofo_error':
+                    console.log('PoFo connection error!!');
+                    alert('No connection to Atari Portfolio.');
+                    break;
                 default:
                     console.log('error');
                     break;
@@ -49,15 +53,13 @@ function connectWebSocket() {
 
         ws.addEventListener('error', () => {
             console.log('WebSocket error');
-            alert('Error connecting to WebSocket. The page will now reload.');
-            location.reload();
+            alert('Error connecting to WebSocket.');
         });
 
         ws.addEventListener('close', () => {
             ws = null;
             console.log('Disconnected!!');
-            alert('WebSocket connection lost. The page will now reload.');
-            location.reload();
+            alert('WebSocket connection lost.');
             setTimeout(() => {
                 ws = new WebSocket(`ws://${location.hostname}:${port}`);
             }, 5000);
@@ -96,7 +98,7 @@ function clearFileList() {
 function populateFileList({ files = [] } = {}) {
     const fileList = document.getElementById('file_list');
     fileList.innerHTML = '';
-
+    if (files === false) return;
     files.forEach(file => {
         const listItem = document.createElement('li');
         const link = document.createElement('a');
