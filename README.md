@@ -19,7 +19,7 @@ Thank you!
 The [Atari Portfolio](https://en.wikipedia.org/wiki/Atari_Portfolio) was the first palmtop computer.
 Using and experiencing one today is hard, as you have hard time putting any files onto it.
 
-- The storage cards it uses are no longer produced ([Bee Cards](https://en.wikipedia.org/wiki/Bee_Card_(game_cartridge))) and kind of rare.
+- The storage cards it uses are no longer produced ([Bee Cards](https://en.wikipedia.org/wiki/Bee_Card_(game_cartridge))) and are kind of rare.
 - To transfer files you need the [Atari Portfolio Parallel Interface](https://www.atari-computermuseum.de/hpc_peri.htm),...
 - ... and a PC that actually still has a parallel port,...
 - ... and a transfer program like [transfolio](http://www.pofowiki.de/doku.php?id=software:vorstellung:exchanges:transfolio)
@@ -36,7 +36,7 @@ To fix this, I wanted to provide an easy way to transfer data to the Portfolio w
   - upload files
   - see an activity log
 - In addition, it watches a shared SAMBA folder for uoloaded files to send them to the Portfolio.
-- It also detects whether the connection to the Portfolio has timed out
+- It also detects whether the connection to the Portfolio has timed out.
 
 
 <kbd><img src="images/preview.png" width="400px" /></kbd>
