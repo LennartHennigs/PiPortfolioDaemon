@@ -14,6 +14,9 @@ Thank you!
 
 - This is a NodeJS web server that runs on a Raspberry Pi, connected to the Portfolio's Parallel interface.
 - It offers web interface to upload and download software to and from the Portfolio.
+
+<kbd><img src="images/preview.png" width="600px" /></kbd>
+
 ## Introduction
 
 The [Atari Portfolio](https://en.wikipedia.org/wiki/Atari_Portfolio) was the first palmtop computer.
@@ -27,6 +30,7 @@ Using and experiencing one today is hard, as you have hard time putting any file
 Without the above, the Atari is mostly a pretty plastic brick that you cannot access.
 
 To fix this, I wanted to provide an easy way to transfer data to the Portfolio with modern computers.
+
 ## Functions
 
 - Provides a web page on `[Pi IP-Address]:3000``
@@ -38,9 +42,7 @@ To fix this, I wanted to provide an easy way to transfer data to the Portfolio w
 - In addition, it watches a shared SAMBA folder for uoloaded files to send them to the Portfolio.
 - It also detects whether the connection to the Portfolio has timed out
 
-
-<kbd><img src="images/preview.png" width="400px" /></kbd>
-<kbd><img src="images/output.png" width="400px" /></kbd>
+<kbd><img src="images/output.png" width="600px" /></kbd>
 
 ## Prerequisites
 
@@ -50,6 +52,8 @@ To fix this, I wanted to provide an easy way to transfer data to the Portfolio w
 - NodeJS installed on the Pi
 - `rpfolio` installed on the Pi
 - Nice to have: A shared SAMBA folder on the Pi
+
+<kbd><img src="images/parallel.png" /></kbd>
 
 ## How To Use
 
@@ -65,5 +69,5 @@ To fix this, I wanted to provide an easy way to transfer data to the Portfolio w
 - open `[ip address of your Pi]:3000` in your browser
 - transfer away
 
-<kbd><img src="images/platine2.png" /></kbd>
 <kbd><img src="images/platine1.png" /></kbd>
+<kbd><img src="images/platine2.png" /></kbd>
