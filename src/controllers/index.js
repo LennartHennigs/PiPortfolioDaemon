@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 
 const config = require('../config');
-const { receiveFile } = require('../utils');
+const { receiveFileFromPortfolio } = require('../utils');
 const { sendToActivityLog, sendDirList } = require('../websockets');
 
 const multer  = require('multer');
@@ -28,7 +28,7 @@ const getHomePage = (req, res) => {
  * @param {object} res - Express response object.
  */
 const serveStaticFiles = (req, res) => {
-  const filePath = path.join(config.webserverPath, req.path);
+  const filePath = path.join(config.webserverFolder, req.path);
   res.sendFile(filePath);
 };
 
@@ -42,7 +42,7 @@ const downloadFile = (req, res) => {
   const fileName = req.params.filename;
   process.stdout.write(`- downloading ${fileName} from Portfolio `);
   
-  if (receiveFile(fileName)) {
+  if (receiveFileFromPortfolio(fileName)) {
     const filePath = path.join('./', fileName);
     sendToActivityLog(`\u{2b07} ${fileName} `);
     
