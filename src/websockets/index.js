@@ -1,11 +1,23 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 const WebSocket = require('ws');
+const path = require('path');
 
 const config = require('../config');
 const { getDirListFromPortfolio } = require('../utils');
 
 let clients = [];
+
+///////////////////////////////////////////////////////////////////////////////
+
+function normalizePortfolioPath(path_str) {
+    path_str = path.normalize(path_str);
+    if (!path_str.endsWith('\\')) {
+        path_str += '\\';
+    }
+    config.portfolioPath = path_str;
+    sendSetFolder(config.portfolioPath);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 /**
@@ -26,13 +38,14 @@ const setupWebSockets = () => {
             switch (message.command) {
                 case 'page_loaded':
                     console.log("- web page was loaded");
-                    sendSetFolder(config.drive + '\\');
+                    normalizePortfolioPath(config.portfolioPath);
                     sendDirList();
                     break;
                 case 'set_folder':
                     // Handle the 'set_folder' command here
-                    console.log(`- setting Portfolio folder: ${message.folder}`)
-                    config.drive = message.folder;
+                    console.log(`- setting Portfolio folder: ${message.folder}`);
+                    normalizePortfolioPath(message.folder);
+                    sendToActivityLog(`📁 ${config.portfolioPath}\n`);
                     sendDirList();
                     break;
                 default:
@@ -65,7 +78,6 @@ function sendDirList() {
  * Sends the new folder name to the HTML page.
  * @param {string} folder - The folder name to send.
  */
-
 function sendSetFolder(folder) {
     const newMessage = {
         command: 'set_folder',
