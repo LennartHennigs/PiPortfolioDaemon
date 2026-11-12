@@ -40,6 +40,11 @@ const serveStaticFiles = (req, res) => {
  */
 const downloadFile = (req, res) => {
   const fileName = req.params.filename;
+  // Only plain file names: no paths, so the download and the delete below
+  // can't reach files outside the working directory.
+  if (!fileName || fileName !== path.basename(fileName) || /[\\/\0]/.test(fileName) || fileName === '..' || fileName === '.') {
+    return res.status(400).send('Invalid file name.');
+  }
   process.stdout.write(`- downloading ${fileName} from Portfolio `);
   
   if (receiveFileFromPortfolio(fileName)) {

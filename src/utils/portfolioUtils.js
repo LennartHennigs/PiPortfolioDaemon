@@ -2,7 +2,26 @@
 
 const config = require('../config');
 
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
+
+///////////////////////////////////////////////////////////////////////////////
+/**
+ * Runs an rpfolio command template from the config without a shell.
+ * The template is split on spaces first and placeholders like <file> and
+ * <drive> are filled in afterwards, so each value stays a single argument
+ * and is never interpreted as shell syntax.
+ * @param {string} template - e.g. 'rpfolio -f -t <file> <drive>'
+ * @param {object} values - placeholder values, e.g. { file, drive }
+ * @param {object} [options] - extra execFileSync options
+ * @returns {Buffer} the command's stdout
+ */
+const runPortfolioCommand = (template, values, options = {}) => {
+    const [cmd, ...args] = template
+        .split(' ')
+        .filter(Boolean)
+        .map(part => part.replace(/<(\w+)>/g, (match, key) => (key in values ? String(values[key]) : match)));
+    return execFileSync(cmd, args, { stdio: ['ignore', 'pipe', 'ignore'], ...options });
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -13,10 +32,9 @@ const { execSync } = require('child_process');
 
 // FYI: rpfolio does not return an error if a folder does not exists...
 const getDirListFromPortfolio = () => {
-    const action = config.listCommand.replace('<drive>', config.portfolioPath);
     try {
-      const res = execSync(action, {
-        stdio: ['ignore', 'pipe', 'ignore'], timeout: config.portfolioTimeout
+      const res = runPortfolioCommand(config.listCommand, { drive: config.portfolioPath }, {
+        timeout: config.portfolioTimeout
       })
         .toString()
         .split('\n')
@@ -39,10 +57,9 @@ const getDirListFromPortfolio = () => {
   
   const receiveFileFromPortfolio = (fn) => {
     try {
-      const action = config.receiveCommand
-        .replace('<file>', fn)
-        .replace('<drive>', config.portfolioPath);
-      execSync(action, { stdio: ['ignore', 'pipe', 'ignore'], timeout: config.portfolioTimeout });
+      runPortfolioCommand(config.receiveCommand, { file: fn, drive: config.portfolioPath }, {
+        timeout: config.portfolioTimeout
+      });
     } catch (error) {
       console.error('- Error during file transfer');
       return false;
@@ -51,6 +68,6 @@ const getDirListFromPortfolio = () => {
   };
   
 ///////////////////////////////////////////////////////////////////////////////
-module.exports = { getDirListFromPortfolio, receiveFileFromPortfolio };
+module.exports = { runPortfolioCommand, getDirListFromPortfolio, receiveFileFromPortfolio };
 ///////////////////////////////////////////////////////////////////////////////
   
