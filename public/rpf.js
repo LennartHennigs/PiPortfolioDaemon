@@ -20,7 +20,7 @@ enableDropZone();
 
 function connectWebSocket() {
     try {
-        ws = new WebSocket(`ws://${location.hostname}:${port}`);
+        ws = new WebSocket(`ws://${location.host}`);
         ws.addEventListener('open', () => {
             console.log('Connected to server!');
             ws.send(JSON.stringify({ command: 'page_loaded' }));
@@ -61,7 +61,7 @@ function connectWebSocket() {
             console.log('Disconnected!!');
             alert('WebSocket connection lost.');
             setTimeout(() => {
-                ws = new WebSocket(`ws://${location.hostname}:${port}`);
+                ws = new WebSocket(`ws://${location.host}`);
             }, 5000);
         });
     } catch (error) {

@@ -11,7 +11,7 @@ const config = {
     portfolioPath: 'c:\\',
     webserverFolder: path.join(__dirname, '../..', 'public'),
     homepage: path.join(__dirname, '../..', 'public', 'rpf.html'),
-    sharedFolder: path.join(__dirname, '../../..', 'upload'),
+    sharedFolder: path.join(__dirname, '../..', 'upload'),
     tmpFolder: '/tmp',
     // !!! TODO: be better w/ *.*
     listCommand: 'rpfolio -l <drive>*.*',

@@ -1,11 +1,12 @@
 
 const express = require('express');
 const multer  = require('multer');
+const config = require('../config');
 const { getHomePage, serveStaticFiles, downloadFile, uploadFile } = require('../controllers');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'upload/')
+        cb(null, config.sharedFolder)
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname)

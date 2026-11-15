@@ -9,3 +9,10 @@ platformio.ini
 # arduino_ci unit test binaries and artifacts
 *.bin
 *.bin.dSYM
+# node
+node_modules/
+npm-debug.log*
+# editor swap files
+*.swp
+*.swo
+*~

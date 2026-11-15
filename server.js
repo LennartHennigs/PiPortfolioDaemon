@@ -37,9 +37,9 @@ console.log(`-> ${config.portfolioPath}\n`);
 
 const server = app.listen(PORT, () => {
     const address = getIP();
-    console.log(`Webserver running at http://${address}:${config.appPort}`);
+    console.log(`Webserver running at http://${address}${PORT == 80 ? "" : ":" + PORT}`);
     
-    setupWebSockets();
+    setupWebSockets(server);
     setupDaemon();
 });
 

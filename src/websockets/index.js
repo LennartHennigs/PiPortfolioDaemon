@@ -34,8 +34,8 @@ function sendPortfolioError() {
  * Sets up a WebSocket server and handles client connections.
  * @function setupWebSockets
  */
-const setupWebSockets = () => {
-    const wsServer = new WebSocket.Server({ port: config.wsPort });
+const setupWebSockets = (server) => {
+    const wsServer = new WebSocket.Server({ server });
 
     wsServer.on('connection', (ws) => {
         ws.binaryType = 'arraybuffer';

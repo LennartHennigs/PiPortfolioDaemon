@@ -1,7 +1,7 @@
 const chokidar = require('chokidar');
 const path = require('path');
 const fs = require('fs');
-const { execSync } = require('child_process');
+const { runPortfolioCommand } = require('../utils');
 
 const config = require('../config');
 const { sendToWebsite, sendToActivityLog, sendDirList } = require('../websockets');
@@ -45,8 +45,7 @@ const transferFile = (filePath) => {
         if (!fs.existsSync(filePath)) {
             throw new Error(`File does not exist: ${filePath}`);
         }
-        const action = config.transferCommand.replace('<file>', filePath).replace('<drive>', config.portfolioPath);
-        execSync(action, { stdio: ['ignore', 'pipe', 'ignore'] });
+        runPortfolioCommand(config.transferCommand, { file: filePath, drive: config.portfolioPath });
         fs.unlinkSync(filePath);
         return true;
     } catch (error) {
